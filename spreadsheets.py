@@ -67,6 +67,25 @@ def parse_csv():
     }
     return all_data
 
+'''
+returns 2 dictionaries.
+all_users_comments = {
+        'user1': [all comments] ...
+        'user2': [all comments] ...
+    }
+users_comments_by_group = {
+    'user' :
+        {
+            'HH group 1': [ ... comments ... ]
+        }
+}
+'''
+def get_user_dict():
+    all_users_data = {}
+    user_comments_by_group = {}
+
+    spreadsheet = open('HH_Data.csv')
+
 
 
 def main():
