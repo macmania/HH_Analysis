@@ -22,9 +22,6 @@ def parse_csv():
 
     data_inconsistent = {}
 
-    #initializing what the keys look like
-    #    data[key] = []
-
     for data_str in worksheet:
         if len(data_str) != len(keys):
             #print 'data', data_str
@@ -142,17 +139,49 @@ def get_user_dict():
     sheet.close()
     return users_dictionary
 
+
+def get_group_dict():
+    comments_by_group = {}
+
+    sheet = open('HH_Data.csv')
+    csv_spreadsheet = csv.reader(sheet)
+    keys = next(csv_spreadsheet)
+
+    for item in csv_spreadsheet:
+        data_str = item
+        if len(data_str) != len(keys) and len(data_str) >= 6:
+            data_inconsistent = data_str
+            group = data_inconsistent[GROUP_NAME]
+            name = data_inconsistent[NAME]
+            if not has_numbers(name) and len(name.split(' ')) > 1 and len(message) > 1:
+                if is_group(group):
+                    if group in comments_by_group.keys():
+                        comments_by_group[group].append(message)
+                    else:
+                        comments_by_group[group] = [message]
+        elif len(data_str) == len(keys):
+            name = data_str[NAME]
+            message = data_str[MESSAGE]
+            group = data_str[GROUP_NAME]
+            if len(message) > 1 and is_group(group):
+                if group in comments_by_group.keys():
+                    comments_by_group[group].append(message)
+                else:
+                    comments_by_group[group] = [message]
+    sheet.close()
+    return comments_by_group
+
 def is_group(input_string):
     return bool('Hackathon Hackers' in input_string or 'HH' in input_string)
-
 
 def has_numbers(inputString):
     return bool(re.search(r'\d', inputString))
 
-
-def main():
-	#worksheet = open('HH_Data.csv')
-    parse_csv()
-
-if __name__ == '__main__':
-	main()
+#
+#
+# def main():
+# 	#worksheet = open('HH_Data.csv')
+#     parse_csv()
+#
+# if __name__ == '__main__':
+# 	main()
