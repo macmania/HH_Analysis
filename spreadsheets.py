@@ -1,9 +1,16 @@
-# from nltk.corpus import wordnet as wn
-# import os
-# import httplib2
-# import atom
-# import io
-# from django.utils.encoding import smart_str, smart_unicode
+from nltk.corpus import wordnet as wn
+import os
+import httplib2
+import atom
+import io
+from django.utils.encoding import smart_str, smart_unicode
+import re
+
+ID = 0
+FROM_ID = 1
+NAME = 2
+GROUP_NAME = 4
+MESSAGE = 5
 
 def parse_csv():
     num_of_inconsistent = 0
@@ -85,7 +92,63 @@ def get_user_dict():
     user_comments_by_group = {}
 
     spreadsheet = open('HH_Data.csv')
+    keys = spreadsheet.readline().split(',')
 
+    for item in spreadsheet:
+        data_str = item.split(',')
+
+        if len(data_str) != len(keys) and len(data_str) >= 6:
+            data_inconsistent = data_str
+            name = data_inconsistent[NAME]
+            message = data_inconsistent[MESSAGE]
+            group = data_inconsistent[GROUP_NAME]
+            if not has_numbers(name) and len(name.split(' ')) > 1 and len(message) > 1:
+                if name in all_users_data.keys():
+                    if (is_group(group)):
+                        if group in user_comments_by_group[name].keys():
+                            user_comments_by_group[name][group].append(message)
+                        else:
+                            user_comments_by_group[name][group] = [message]
+                    all_users_data[name].append(message)
+                else:
+                    all_users_data[name] = [message]
+                    if(is_group(group)):
+                        user_comments_by_group[name] = {group:[message]}
+                    else:
+                        user_comments_by_group[name] = {}
+        elif len(data_str) == len(keys):
+            name = data_str[NAME]
+            message = data_str[MESSAGE]
+            group = data_str[GROUP_NAME]
+            if len(message) > 1:
+                if name in all_users_data.keys():
+                    if (is_group(group)):
+                        if group in user_comments_by_group[name].keys():
+                            user_comments_by_group[name][group].append(message)
+                        else:
+                            user_comments_by_group[name][group] = [message]
+                    all_users_data[name].append(message)
+                else:
+                    all_users_data[name] = [message]
+                    if(is_group(group)):
+                        user_comments_by_group[name] = {group:[message]}
+                    else:
+                        user_comments_by_group[name] = {}
+
+    users_dictionary = {
+        'user comments': all_users_data,
+        'user comments by group': user_comments_by_group
+    }
+
+    spreadsheet.close()
+    return users_dictionary
+
+def is_group(input_string):
+    return bool('Hackathon Hackers' in input_string or 'HH' in input_string)
+
+
+def has_numbers(inputString):
+    return bool(re.search(r'\d', inputString))
 
 
 def main():
