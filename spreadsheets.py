@@ -5,6 +5,7 @@ import atom
 import io
 from django.utils.encoding import smart_str, smart_unicode
 import re
+import csv
 
 ID = 0
 FROM_ID = 1
@@ -15,17 +16,16 @@ MESSAGE = 5
 def parse_csv():
     num_of_inconsistent = 0
     data = {}
-    worksheet = open('HH_Data.csv')
-    keys = worksheet.readline().split(',')
+    worksheet_file = open('HH_Data.csv')
+    worksheet = csv.reader(worksheet_file)
+    keys = next(worksheet)
 
     data_inconsistent = {}
 
     #initializing what the keys look like
     #    data[key] = []
 
-    for item in worksheet:
-        data_str = item.split(',')
-
+    for data_str in worksheet:
         if len(data_str) != len(keys):
             #print 'data', data_str
             #print len(data_str)
@@ -59,11 +59,9 @@ def parse_csv():
                     data[key] = [item]
 
     output = open('output', 'w')
-    #for key in data.keys():
-        #print key, ': ', data[key][0]
-        #print key, ': ', data[key]
-        #output.write(key)
-        #output.write(data[key])
+    for key in data.keys():
+        output.write(key + ' ' + data[key])
+
     print num_of_inconsistent
     output.close()
     worksheet.close()
@@ -91,11 +89,12 @@ def get_user_dict():
     all_users_data = {}
     user_comments_by_group = {}
 
-    spreadsheet = open('HH_Data.csv')
-    keys = spreadsheet.readline().split(',')
+    sheet = open('HH_Data.csv')
+    csv_spreadsheet = csv.reader(sheet)
+    keys = next(csv_spreadsheet)
 
-    for item in spreadsheet:
-        data_str = item.split(',')
+    for item in csv_spreadsheet:
+        data_str = item
 
         if len(data_str) != len(keys) and len(data_str) >= 6:
             data_inconsistent = data_str
@@ -140,7 +139,7 @@ def get_user_dict():
         'user comments by group': user_comments_by_group
     }
 
-    spreadsheet.close()
+    sheet.close()
     return users_dictionary
 
 def is_group(input_string):
