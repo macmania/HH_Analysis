@@ -1,0 +1,13 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>{{title}}</title>
+</head>
+<body>
+    <h1>{{body.key}}</h1>
+    Sentences:
+    {% for sentence in body.sentences  %}
+        <div><h2>{{sentence.body}}</h2></div>
+    {% endfor %}
+</body>
+</html>
